@@ -33,34 +33,29 @@ print_str(prompt)
 li a7, 5
 ecall # read an integer to a0
 addi t0, a0, 1 # t0 = a0 + 1
+add t1, x0, x0
 
-init_loop: 
-	addi t1, t1, 1 # t1++
-	beq t0, t1, exit # if (t1 == t2) goto exit
-	print_str(newline)
-	add t4, x0, x0 # t4 = 0
-	rem t2, t1, t3 # t2 = t1 % 3
-	beq t2, x0, print_fizz # if (!t3) goto print_fizz
-	check_buzz:
-		rem t2, t1, t5 # t2 = t1 % 5
-		beq t2, x0, print_buzz # if (!t2) 
-	beq t4, x0, print_num # if (!t4) goto print_num 
-	b init_loop
-
-print_fizz:
+loop:  beq t1, t0, exit
+	add  t4, x0, x0
+	rem t2, t1, t3
+	bne t2, x0, check_buzz
 	print_str(fizz)
-	addi t4, t4, 1
-	b check_buzz
-	
-print_buzz: 
-	print_str(buzz)
-	b init_loop
-	
-print_num:
-	print_int(t1)
-	b init_loop
+	addi t4, t4, 1 
+	check_buzz:
+		rem t2, t1, t5
+		bnez t2, check_neither
+		print_str(buzz)
+		addi t4, t4, 1
+	check_neither:
+		bnez t4, finish_loop
+		print_int(t1)
+	finish_loop:
+		addi t1, t1, 1
+		print_str(newline)
+		j loop
 	
 exit:
 	print_str(completed)
 	li a7, 10
 	ecall
+		
